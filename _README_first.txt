@@ -1,6 +1,3 @@
-""" Email: code... I want to develop it further.. need more data to increase the efficiency...
-Mention github link in email : https://github.com/sohomghosh/company_clustering
-"""
 Hello!
 
 This is the file to start with. Link for the  GitHub repository is:- 
