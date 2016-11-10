@@ -39,18 +39,22 @@ for (i in 1:nrow(test)){
     }
     nu<-LCS(str1,str2)$LLCS #Storing the length of longest common subsequence
                             #Other method is to use stringdist
+    
     if(nu>threshold){ #When nu is above the threshold
       flag=1
       nu<-nu/clus_nos[as.numeric(train[j,2]),2] #Normalzing it when more number of strings are into one cluster
-      
       if(is.na(nu)){
         nu=0
-      }
-      res[i,as.numeric(train[j,2])]<-res[i,as.numeric(train[j,2])]+nu
-      if(is.na(res[i,as.numeric(train[j,2])])){
-        res[i,as.numeric(train[j,2])]=0 
         flag2=1
+        #print(c(j,"  ",as.numeric(train[j,2])))
       }
+      
+      res[i,as.numeric(train[j,2])]<-res[i,as.numeric(train[j,2])]+nu
+      #if(is.na(res[i,as.numeric(train[j,2])])){
+       # res[i,as.numeric(train[j,2])]=0 
+        #flag2=1
+        #print(c(i,j))
+      #}
     }
   }
   if(flag==0 | flag2==1){#When there is no match, the train file is updated, new cluster_id is assigned to the new company 
