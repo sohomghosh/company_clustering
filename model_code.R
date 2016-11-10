@@ -25,7 +25,6 @@ colnames(clus_nos)<-c("Cluster_id","Frequency")
 clus_max_id<-max(as.numeric(train$Cluster_id))
 #install.packages("qualV",dependencies = T) #One time process
 library("qualV") #This library is used to calculate the match between two strings
-###vv<-nrow(train)
 for (i in 1:nrow(test)){
   comp_name<-as.character(test[i,1])
   str1<-unlist(strsplit(comp_name,"")) #Coverting the name of the company from the test set to characters
@@ -46,15 +45,9 @@ for (i in 1:nrow(test)){
       if(is.na(nu)){
         nu=0
         flag2=1
-        #print(c(j,"  ",as.numeric(train[j,2])))
       }
       
       res[i,as.numeric(train[j,2])]<-res[i,as.numeric(train[j,2])]+nu
-      #if(is.na(res[i,as.numeric(train[j,2])])){
-       # res[i,as.numeric(train[j,2])]=0 
-        #flag2=1
-        #print(c(i,j))
-      #}
     }
   }
   if(flag==0 | flag2==1){#When there is no match, the train file is updated, new cluster_id is assigned to the new company 
@@ -64,8 +57,6 @@ for (i in 1:nrow(test)){
     ss<-paste0("Cluster",clus_max_id)
     res[,ss]<-0
     res[i,clus_max_id]<-1
-    #print(i)
-    #print(clus_max_id)
   }
 }
 row_sum<-apply(res,MARGIN = 1,sum)#Finding sum of each rows
