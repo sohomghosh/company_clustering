@@ -25,12 +25,13 @@ colnames(clus_nos)<-c("Cluster_id","Frequency")
 clus_max_id<-max(as.numeric(train$Cluster_id))
 #install.packages("qualV",dependencies = T) #One time process
 library("qualV") #This library is used to calculate the match between two strings
-vv<-nrow(train)
+###vv<-nrow(train)
 for (i in 1:nrow(test)){
   comp_name<-as.character(test[i,1])
   str1<-unlist(strsplit(comp_name,"")) #Coverting the name of the company from the test set to characters
   flag<-0 #To check whether the match has been occuring atleast once
-  for (j in 1:vv){ ####EXPERIMENT HERE
+  flag2<-0
+  for (j in 1:nrow(train)){ ####EXPERIMENT HERE
     comp_name_train<-as.character(train[j,1])
     str2<- unlist(strsplit(comp_name_train,"")) ##Coverting the name of the company from the train set to characters
     if(j>nrow(train)){
@@ -41,19 +42,28 @@ for (i in 1:nrow(test)){
     if(nu>threshold){ #When nu is above the threshold
       flag=1
       nu<-nu/clus_nos[as.numeric(train[j,2]),2] #Normalzing it when more number of strings are into one cluster
+      
+      if(is.na(nu)){
+        nu=0
+      }
       res[i,as.numeric(train[j,2])]<-res[i,as.numeric(train[j,2])]+nu
+      if(is.na(res[i,as.numeric(train[j,2])])){
+        res[i,as.numeric(train[j,2])]=0 
+        flag2=1
+      }
     }
   }
-  if(flag==0){#When there is no match, the train file is updated, new cluster_id is assigned to the new company 
+  if(flag==0 | flag2==1){#When there is no match, the train file is updated, new cluster_id is assigned to the new company 
     clus_max_id<-clus_max_id+1
     nm<-as.character(test[i,1])
     train<-rbind(train,c(nm,clus_max_id))
     ss<-paste0("Cluster",clus_max_id)
     res[,ss]<-0
     res[i,clus_max_id]<-1
+    #print(i)
+    #print(clus_max_id)
   }
 }
-
 row_sum<-apply(res,MARGIN = 1,sum)#Finding sum of each rows
 res_norm<-res
 for (i in 1:nrow(res)){
