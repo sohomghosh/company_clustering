@@ -30,7 +30,7 @@ for (i in 1:nrow(test)){
   comp_name<-as.character(test[i,1])
   str1<-unlist(strsplit(comp_name,"")) #Coverting the name of the company from the test set to characters
   flag<-0 #To check whether the match has been occuring atleast once
-  for (j in 1:vv){
+  for (j in 1:vv){ ####EXPERIMENT HERE
     comp_name_train<-as.character(train[j,1])
     str2<- unlist(strsplit(comp_name_train,"")) ##Coverting the name of the company from the train set to characters
     if(j>nrow(train)){
@@ -66,7 +66,8 @@ for (i in 1:nrow(res)){
 train_new<-cbind(train[,2],train[,1])#Just to bring back to the original format
 colnames(train_new)<-c("Company_name","Cluster_id")
 write.csv(train_new,"updated_company_cluster_sample.csv",row.names=F)
-write.csv(res_norm,"cluster_distribution.csv",row.names = F)
+res_norm_with_name<-cbind(test,res_norm)
+write.csv(res_norm_with_name,"cluster_distribution.csv",row.names = F)
 
 
 
@@ -94,10 +95,10 @@ colnames(test_fe)<-featr
 test_fe<-as.data.frame(test_fe)
 
 for (i in 1:nrow(test)){
-  str<-as.character(test[i,1])
+  str<-trimws(as.character(test[i,1]))
   li<-unlist(strsplit(str,""))
   for(j in 1:length(li)){
-    test_fe[i,c(li[j])]=test_fe[i,c(li[j])]+1 #Whenever the character mentioned in the column is ocurring in the test set, the count is increased by one
+    test_fe[i,c(li[j])]=as.numeric(test_fe[i,c(li[j])])+1 #Whenever the character mentioned in the column is ocurring in the test set, the count is increased by one
   }
 }
 
@@ -110,18 +111,27 @@ colnames(clus_nos)<-c("Cluster_id","Frequency")
 clus_max_id<-max(as.numeric(train_org$Cluster_id))
 
 train_org_du<-train_org
-cor_th<-.4 #Threshold for correlation
-#Correlation check
+#install.packages("lsa",dependencies=T) #One time process
+library(lsa)
+sim_th<-.4 #Threshold for similarity : NEED TO TUNE IT
+#Simlarity calculate
 for(i in 1:nrow(test_fe)){
   vec1<-test_fe[i,]
   flag<-0
   for(j in 1:nrow(train_fe)){
     vec2<-train_fe[j,]
-    corre<-cor(as.numeric(vec1),as.numeric(vec2)) #Calculating correlation between test vector and each of the train vector
-    if(corre>cor_th){ #.4 would be better as threshold for correlation
-      flag=1
-      corre<-corre/clus_nos[as.numeric(train_org[j,2]),2] #Normalzing it when more number of strings are into one cluster
-      res1[i,as.numeric(train_org[j,2])]<-res1[i,as.numeric(train_org[j,2])]+corre
+    vec11<-vec1[vec1!=0 | vec2!=0]
+    vec22<-vec2[vec2!=0 | vec1!=0]
+    sim<-lsa::cosine(vec11, vec22) #Calculating cosine similarity between 2 vectors
+    if(!is.na(sim)){
+      if(sim>sim_th){ 
+        flag=1
+        sim<-sim/clus_nos[as.numeric(train_org[j,2]),2] #Normalzing it when more number of strings are into one cluster
+        res1[i,as.numeric(train_org[j,2])]<-res1[i,as.numeric(train_org[j,2])]+sim
+      }
+    }
+    else{
+      sim<-0 #THIS MAY BE IMPROVED FURTHER
     }
   }
   if(flag==0){#When the company name of the test set is assigned to none of the clusters
@@ -146,7 +156,8 @@ for (i in 1:nrow(res1)){
 train_new1<-cbind(train_org_du[,2],train_org_du[,1])
 colnames(train_new1)<-c("Company_name","Cluster_id")
 write.csv(train_new1,"updated_company_cluster_sample_v2.csv",row.names=F)
-write.csv(res_norm1,"cluster_distribution_v2.csv",row.names = F)
+res_norm1_with_name<-cbind(test,res_norm1)
+write.csv(res_norm1_with_name,"cluster_distribution_v2.csv",row.names = F)
 
 
 

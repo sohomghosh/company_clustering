@@ -4,15 +4,15 @@ This is the file to start with. Link for the  GitHub repository is:-
 https://github.com/sohomghosh/company_clustering
 
 Approach:-
-Entity Recognition & Text Clustering are one of the challenging tasks in Text Analytics. In this repository, I am presenting few codes to deal with such challenges. The objective is to cluster companies based on their names. In order to do so two approaches are being used :- 1> Clustering based on Common subsequence of characters 2> Converting names of companies to character vectors (features). Clustering is done based on correlation between these vectors.
+Entity Recognition & Text Clustering are one of the challenging tasks in Text Analytics. In this repository, I am presenting few codes to deal with such challenges. The objective is to cluster companies based on their names. In order to do so two approaches are being used :- 1> Clustering based on Common subsequence of characters 2> Converting names of companies to character vectors (features). Clustering is done based on cosine similarity between these vectors.
 Firstly, as a pre-processing step the special characters and blank spaces have been removed using regular expressions.
 	Method-1:
 		Clustering based on common sequence of characters. Each of the names of the companies in the test set is compared with all the names of the companies 
 	Method-2:
-		Clustering based on correlation of feature vectors. Here, a feature set has been constructed from the names of the companies. The features are the frequency of occurence of characters.
+		Clustering based on cosine similarity of feature vectors. Here, a feature set has been constructed from the names of the companies. The features are the frequency of occurence of characters.
 	Challenges:
 		Setting a optimal threshold for deciding to call it a match in both the methods is an interesting task. The sample being less in size results in less overlapping between train & test data.
-		Higher values of threshold results in creation of many singleton clusters, whereas setting a low threshold (= 10, as done here in order to show case the probabilistic approach) results in different companies (like hcl services & akash services) getting clubbed together.
+		Higher values of threshold results in creation of many singleton clusters, whereas setting a low threshold (= 10, as done here in order to show case the probabilistic approach) results in different companies (like hcl technologies & akash technologies) getting clubbed together.
 
 References:-
 1) http://www.cs.umd.edu/~getoor/Tutorials/ER_VLDB2012.pdf
@@ -29,8 +29,9 @@ Step_1: Install python 2.7 [preferably the Anaconda version from https://www.con
 #Please note: The "preprocess.py" file, the Traing file "company-clusters-sample.txt", the Test file "unmapped-sample.txt" should be present in the same directory
 
 Step_2: Install R 3.3.2 [Link: https://cran.r-project.org/]
-#In the R console write the following command to install the package qualV
-install.packages("qualV")
+#In the R console write the following command to install the package qualV, lsa
+install.packages("qualV",dependencies=T)
+install.packages("lsa",dependencies=T)
 setwd("<path_of_the_directory_containing_the_python_files_and_data_files>") #This is to set the working directory
 
 									#####EXECUTION#####
@@ -48,7 +49,9 @@ NOTE: Please train the algorithm with more data before testing it to evaluate it
 									#####ASSESSMENT & CLOSING THOUGHTS#####
 Issues- The complexity of the algorithm needs to be reduced. Presently it takes high time to compute. It needs to be optimized. Here the samples are traversed linearly. It takes O(n) time. This can be reduced to O(log(n)) by sorting the data and using binary search on that.  
 
-FUTURE WORKS:- Common terms like "services", "private", "limited" may be removed for better results.
+FUTURE WORKS:-
 Removing white spaces and special characters in the very first step makes it difficult for restoring back the original string.
 Machine learning algorithms for probabilistic classification may be used for assigning clusters.
 The output of the above methods may be ensembled to produce better results.
+The approach at its present state is not dynamic i.e. if 2 companies with similar names appears only in test set and not in training set, then seperate cluster id is assigned to them. This can be improved further.
+The threshold can be altered to tune the model further.
